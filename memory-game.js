@@ -29,6 +29,15 @@ const colors = shuffle(COLORS); // shuffles the COLORS array and stores it with 
 
 createCards(colors); // sends colors array to the createCards() function
 
+/** Create interactive button to reload the page */
+/* An optional task for later!
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelector('button').addEventListener('onclick', function() {
+    location.reload;
+  });
+});
+*/
+
 /** Shuffle array items in-place and return shuffled array. */
 
 function shuffle(items) {
@@ -72,14 +81,12 @@ function idCreator(colorVal) {
 }
 
 /** Flip a card face-up. */
-
 function flipCard(card, colorToAdd) {
   // update the card's background based on it's actual hidden color
   card.style.backgroundColor = `${realColors[colorToAdd]}`;
 }
 
 /** Flip a card face-down. */
-
 function unFlipCard(firstID, secondID) {
   // grab both of the elements to unflip
   let cardOne = document.getElementById(firstID);
@@ -88,16 +95,17 @@ function unFlipCard(firstID, secondID) {
   cardTwo.style.backgroundColor = "rgb(248, 245, 215)"; // resets the styles of both cards
 }
 
+
+
 /** Handle clicking on a card: this could be first-card or second-card. */
 
 function handleCardClick(event) {
-
   // gather info about the event
   const theCard = event.target; // this grabs the element
   const cardID = theCard.id; // this is its id
   const cardColor = cardID.slice(0, cardID.length - 1); // this is its class & its color
 
-  if (numActive < 2){ // things will only happen if there's 0 or 1 active cards
+  if (numActive < 2){ // ensures things will only happen if there's 0 or 1 active cards
     numActive++; // a card was just clicked on, so add to number of active cards in play
 
     // LATER, add a time delay here!
