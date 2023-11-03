@@ -19,6 +19,7 @@ let realColors = { // the colors to change things to as needed
 let colorIDsArr = []; // I'll populate this array with ids to make ID assignments easier
 // id assignment will happen in idCreator() function
 
+let matchesCount = 0; // this will help display win message in winCheck function
 
 // relevant variables for a flipped card that has yet to be matched
 let numActive = 0; // this represents the number of active cards that are flipped
@@ -56,6 +57,7 @@ function shuffle(items) {
   return items;
 }
 
+/** This function creates the cards. */
 function createCards(colors) {
   const gameBoard = document.getElementById("game"); // this is what we'll append the card to
   for (let color of colors) {
@@ -67,6 +69,7 @@ function createCards(colors) {
     oneCard.addEventListener('click', handleCardClick); // when card is clicked, handleCardClick triggers
   }
 }
+
 
 /** This function creates an id for each distinct card in the array. */
 function idCreator(colorVal) {
@@ -80,11 +83,13 @@ function idCreator(colorVal) {
   }
 }
 
+
 /** Flip a card face-up. */
 function flipCard(card, colorToAdd) {
   // update the card's background based on it's actual hidden color
   card.style.backgroundColor = `${realColors[colorToAdd]}`;
 }
+
 
 /** Flip a card face-down. */
 function unFlipCard(firstID, secondID) {
@@ -96,9 +101,7 @@ function unFlipCard(firstID, secondID) {
 }
 
 
-
 /** Handle clicking on a card: this could be first-card or second-card. */
-
 function handleCardClick(event) {
   // gather info about the event
   const theCard = event.target; // this grabs the element
@@ -106,10 +109,8 @@ function handleCardClick(event) {
   const cardColor = cardID.slice(0, cardID.length - 1); // this is its class & its color
 
   if (numActive < 2){ // ensures things will only happen if there's 0 or 1 active cards
-    numActive++; // a card was just clicked on, so add to number of active cards in play
-
-    // LATER, add a time delay here!
-    flipCard(theCard, cardColor); // flip over the card that was just clicked
+    numActive++; // add to number of active cards in play
+    flipCard(theCard, cardColor); // flip the card that was just clikced
 
     // numActive is either 1 or 2
 
@@ -120,92 +121,34 @@ function handleCardClick(event) {
 
     else if (numActive === 2) { // but if it's 2, you need to check to see if they match!
       if ((cardColor == activeCardsColorClass[0]) && (cardID != activeCardsIDs[0])) {
-        // if it's a match, alert the player
-        console.log('you found a match!');
-        // remove the events from each of those cards
+        // if it's a match, remove events from each of those cards
         // first removal is easy, it's the card you had before
         theCard.removeEventListener('click', handleCardClick); // testing out removing ability
         // second removal requires retrieving the element
         let secondElement = document.getElementById(`${activeCardsIDs[0]}`);
         secondElement.removeEventListener('click', handleCardClick); // removes from second element
+        setTimeout(winCheck, 1000); // triggers winCheck function
       }
-      else {
-        // otherwise, it wasn't a match
-        console.log('sorry bud, that\'s not a match');
-        unFlipCard(cardID, activeCardsIDs[0]); // sends ids of the 2 cards to unflip array
+      else { // if it wasn't a match
+        setTimeout(unFlipCard, 1000, cardID, activeCardsIDs[0]); // unflips cards but on a time delay
       }
-      // either way, you need to reset the saved information
-      numActive = 0; // reset num active
-      activeCardsColorClass = []; // reset class array
-      activeCardsIDs = []; // reset ids array
+      setTimeout(cardReset, 1500); // resets saved info & prevents speed clicking that displays >2 cards
     }
-    // in the case of 2 you need to clear out the array
-    // if cards need to be unflipped you can get element by id! super convenient
-
-
-
-
-
-
   }
-
-
-
-
-  console.log('you clicked on a card!');
-  console.log(`the card's id is ${theCard.id} and its color is ${cardColor}`);
-
-
-  /* IMPORTANT
-  const theCard = event.target;
-  theCard.removeEventListener('click', handleCardClick); // testing out removing ability
-  this is what I'll use (in some capacity) to make cards unclickable after they're out of use!
-  */
-
-  // ... you need to write this ...
 }
 
+/** resets the stored information on cards when 2 cards are flipped, whether or not they're a match. */
+function cardReset() {
+  // reset previously saved information -- this happens whenever 2 cards are flipped over
+  numActive = 0; // reset num active
+  activeCardsColorClass = []; // reset class array
+  activeCardsIDs = []; // reset ids array
+}
 
-/*
-there is in fact a way to theoretically unflip a card you didn't want to flip over, but i don't think that's how
-memory normally works (there's no takesies backsies)
-
-current priority is to figure out how the timer works because it's automatically reseting it without showing you the failing
-
-also make a congratulatory message to the winner once they've won
-
-
-to change # of flipped cards and max it at 2, write a conditional and also set a global variable
-that initializes flipCount
-
-let flipCount = 0; // this will start the flip count
-
-every time a card is flipped, +1;
-everytime a card is unflipped, -1;
-
-
-will players be allowed to unflip a card before submitting a guess? Is that up to you or could
-it be later in the instructions?
-
-old add event listener function
-
-oneCard.addEventListener('click', e => {
-      handleCardClick(e, color, oneCard.id, oneCard);
-      /* ignore locking and unlocking for now
-      if (oneCard.classList.contains('unlocked')) {
-        handleCardClick(e, color);
-      }
-      else {
-        console.log('the card you clicked is locked'); // test this out soon after dinner!
-      }
-
-
-      oneCard.addEventListener('click', function() {
-        handleCardClick(color, oneCard.id, oneCard);
-
-      so previously I was sending all this information through, but I think that's a bit much.
-      ideally i should be able to find all that information knowing the event itself
-
-      look into that to see if that is possible!
-
-*/
+/** Checks to see if the player won. */
+function winCheck() {
+  matchesCount++; // this function gets triggered when a match is made
+  if (matchesCount === 5) {
+    alert('Congratulations, you won!')
+  }
+}
